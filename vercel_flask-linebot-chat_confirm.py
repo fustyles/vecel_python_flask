@@ -98,6 +98,7 @@ def handle_message(event):
     user_id = event['source']['userId']
     group_id = event['source'].get('groupId', '請將Line bot加入群組後於群組輸入gid重新查詢')
     room_id = event['source'].get('roomId', '請將Line bot加入聊天室後於聊天室輸入rid重新查詢')
+    reply_token = event['replyToken']    
     keys_list = list(app.config['confirm_list'].keys())
     values_list = list(app.config['confirm_list'].values())    
     
@@ -111,7 +112,6 @@ def handle_message(event):
         elif user_message.lower() == "rid":
             return room_id
         elif user_message.lower() == "led":
-            reply_token = event['replyToken']
             reply_message = [
                 {
                     "type": "template",
