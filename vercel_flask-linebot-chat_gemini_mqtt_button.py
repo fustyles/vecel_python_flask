@@ -30,7 +30,7 @@ CHANNEL_ACCESS_TOKEN = "iSHcOEyq3PM0Oe/PvgmCY69jAOdW6cWoj1Zn34VFgduEJzGlWWcZnAo6
 
 # Gemini Key
 GeminiKey = "DLcdVbFKegN3kbGnUidgBBMCaxg7MqC7deOwDP8123"
-# Gemini Key Encrypt
+# Gemini Key Decrypt
 GeminiKeyShift = 3
 
 # Gemini Assistant Behavior
