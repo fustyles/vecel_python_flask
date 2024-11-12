@@ -180,3 +180,10 @@ def caesar_decrypt(text, shift):
         else:
             decrypted_text += char
     return decrypted_text
+
+'''
+# Vercel環境下不用加入以下程式碼
+
+if __name__ == '__main__':
+    app.run(debug=True)
+'''
