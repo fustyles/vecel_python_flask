@@ -21,9 +21,9 @@ app.config['Project_title'] = '法蘭斯的ChatBot'
 # Line Bot CHANNEL ACCESS TOKEN
 CHANNEL_ACCESS_TOKEN = "iSHcOEyq3PM0Oe/PvgmCY69jAOdW6cWoj1Zn34VFgduEJzGlWWcZnAo6LjMt3L9EAldBB4erN2yt/E5tXQNQt7jSyOGKseY2jPD8czzI/RURL7jF/PBKtGm8PwIIymzXcqqdZLP2zaKRhliJUIMdJQdB04t89/1O/w1cDnyilFU=123"
 
-# Gemini Key
+# Gemini Key (Encrypted)
 GeminiKey = "DLcdVbFKegN3kbGnUidgBBMCaxg7MqC7deOwDP8123"
-# Gemini Key Decrypt
+# Gemini Key Decrypt Shift
 GeminiKeyShift = 3
 
 # Gemini Assistant Behavior
