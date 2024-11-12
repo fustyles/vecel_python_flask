@@ -56,7 +56,7 @@ app.config['MQTT_SUBSCRIBE_MESSAGE'] = ''
 # 初始化 Flask-MQTT       
 mqtt = Mqtt(app)    
 
-# HELP指令  [標籤文字, 指令]
+# HELP指令  [標籤文字, 指令文字]
 app.config['help_list'] = {
     "查詢userId": 'id',
     "查詢groupId": 'gid',
@@ -64,7 +64,7 @@ app.config['help_list'] = {
     "LED燈控制": 'led' 
 }
 
-# 開關燈控制指令 [標籤文字, 傳送值]
+# 開關燈控制指令 [標籤文字, MQTT傳送值]
 app.config['button_list'] = {
     "開燈": '1',
     "關燈": '0'
