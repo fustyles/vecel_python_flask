@@ -140,12 +140,13 @@ def handle_event(event):
         return ""
 
 def handle_message(event):
-    # 處理訊息事件
+    # 處理訊息事件 
     user_message = event['message']['text'].strip()
     user_message_type = event['message']['type']
     user_id = event['source']['userId']
     group_id = event['source'].get('groupId', '請將Line bot加入群組後於群組輸入gid重新查詢')
     room_id = event['source'].get('roomId', '請將Line bot加入聊天室後於聊天室輸入rid重新查詢')
+    reply_token = event['replyToken']    
     help_keys_list = list(app.config['help_list'].keys())
     help_values_list = list(app.config['help_list'].values())    
     button_keys_list = list(app.config['button_list'].keys())
@@ -153,7 +154,6 @@ def handle_message(event):
 
     if user_message_type == 'text':
         if user_message.lower() == "help":
-            reply_token = event['replyToken']
             reply_message = [
                 {
                     "type": "template",
@@ -197,7 +197,6 @@ def handle_message(event):
         elif user_message.lower() == help_values_list[2]:
             return room_id
         elif user_message.lower() == help_values_list[3]:
-            reply_token = event['replyToken']
             reply_message = [
                 {
                     "type": "template",
