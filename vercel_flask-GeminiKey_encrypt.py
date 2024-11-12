@@ -25,7 +25,7 @@ def caesar_decrypt(text, shift):
 # 測試範例
 # Gemini Key 
 GeminiKey = "12345678"
-# Encrypted Shift
+# Encrypt Shift
 GeminiKeyShift = 3
 
 # 加密
