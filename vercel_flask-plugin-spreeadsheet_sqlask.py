@@ -73,3 +73,11 @@ def home():
 @app.route('/about')
 def about():
     return app.config['Project_title']
+
+
+'''
+# Vercel環境下不用加入以下程式碼
+
+if __name__ == '__main__':
+    app.run(debug=True)
+'''
