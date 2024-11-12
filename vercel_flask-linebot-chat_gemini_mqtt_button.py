@@ -5,6 +5,8 @@ https://www.facebook.com/francefu
 設定requirements.txt
 Flask==3.0.3
 Flask-MQTT==1.2.1
+
+Gemini Key要填入加密後的字串，或者自行修改程式直接代入！
 """
 
 # 引入 Flask 框架及其相關模組
@@ -134,10 +136,46 @@ def handle_message(event):
     room_id = event['source'].get('roomId', '請將Line bot加入聊天室後於聊天室輸入rid重新查詢')
     keys_list = list(app.config['button_list'].keys())
     values_list = list(app.config['button_list'].values())    
-    
+
     if user_message_type == 'text':
         if user_message.lower() == "help":
-            return f"我是Gemini聊天機器人。\n輸入id：查詢userId\n輸入gid：查詢groupId\n輸入rid：查詢roomId\n輸入對話，可與我暢談哦！"        
+            reply_token = event['replyToken']
+            reply_message = [
+                {
+                    "type": "template",
+                    "altText": "this is a buttons template",
+                    "template": {
+                        "type": "buttons",
+                        "imageBackgroundColor": "#FFFFFF",
+                        "title": "HELP",
+                        "text": "請點選連結送出指令",
+                        "actions": [
+                            {
+                                "type": "message",
+                                "label": "查詢userId",
+                                "text": "id"
+                            },
+                            {
+                                "type": "message",
+                                "label": "查詢groupId",
+                                "text": "gid"
+                            },
+                            {
+                                "type": "message",
+                                "label": "查詢roomId",
+                                "text": "rid"
+                            },
+                            {
+                                "type": "message",
+                                "label": "LED控制",
+                                "text": "led"
+                            }
+                        ]
+                    }
+                }
+            ]
+            res = reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, reply_message)
+            return jsonify(res)
         elif user_message.lower() == "id":
             return user_id
         elif user_message.lower() == "gid":
@@ -148,48 +186,45 @@ def handle_message(event):
             reply_token = event['replyToken']
             reply_message = [
                 {
-                  "type": "template",
-                  "altText": "this is a buttons template",
-                  "template": {
-                    "type": "buttons",
-                    "thumbnailImageUrl": "https://i.ibb.co/QmZ6VNv/image.png",
-                    "imageAspectRatio": "square",
-                    "imageSize": "contain",
-                    "imageBackgroundColor": "#FFFFFF",
-                    "title": "控制電燈",
-                    "text": "請點選連結送出控制指令",
-                    "actions": [
-                      {
-                        "type": "message",
-                        "label": keys_list[0],
-                        "text": keys_list[0]
-                      },
-                      {
-                        "type": "message",
-                        "label": keys_list[1],
-                        "text": keys_list[1]
-                      }
-                    ]
-                  }
+                    "type": "template",
+                    "altText": "this is a buttons template",
+                    "template": {
+                        "type": "buttons",
+                        "thumbnailImageUrl": "https://i.ibb.co/QmZ6VNv/image.png",
+                        "imageAspectRatio": "square",
+                        "imageSize": "contain",
+                        "imageBackgroundColor": "#FFFFFF",
+                        "title": "控制電燈",
+                        "text": "請點選連結送出控制指令",
+                        "actions": [
+                            {
+                                "type": "message",
+                                "label": keys_list[0],
+                                "text": keys_list[0]
+                            },
+                            {
+                                "type": "message",
+                                "label": keys_list[1],
+                                "text": keys_list[1]
+                            }
+                        ]
+                    }
                 }
-            ]               
+            ]
             res = reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, reply_message)
-            
             return jsonify(res)
         elif user_message.lower() == keys_list[0]:
             mqtt_res = handle_mqtt_sendMessage(values_list[0])
-    
             if mqtt_res == "ok":
                 return f"MQTT傳送成功： {values_list[0]}\n{app.config['MQTT_SUBSCRIBE_MESSAGE']}"
             else:
-                return f"MQTT傳送失敗： {values_list[0]}"            
+                return f"MQTT傳送失敗： {values_list[0]}"
         elif user_message.lower() == keys_list[1]:
             mqtt_res = handle_mqtt_sendMessage('0')
-    
             if mqtt_res == "ok":
                 return f"MQTT傳送成功： {values_list[1]}\n{app.config['MQTT_SUBSCRIBE_MESSAGE']}"
             else:
-                return f"MQTT傳送失敗： {values_list[1]}"            
+                return f"MQTT傳送失敗： {values_list[1]}"
         else:
             return handle_gemini(user_message, caesar_decrypt(GeminiKey, GeminiKeyShift))
     else:
@@ -311,6 +346,7 @@ def caesar_decrypt(text, shift):
         else:
             decrypted_text += char
     return decrypted_text
+
 
 '''
 # Vercel環境下不用加入以下程式碼
