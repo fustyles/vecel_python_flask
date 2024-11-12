@@ -177,6 +177,13 @@ def handle_things(event):
     return "收到 LINE Things 裝置的訊息。"
 
 
+'''
+# Vercel環境下不用加入以下程式碼
+
+if __name__ == '__main__':
+    app.run(debug=True)
+'''
+
 
 '''
 Line Bot 訊息格式
