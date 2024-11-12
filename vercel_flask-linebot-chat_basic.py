@@ -33,10 +33,9 @@ def home():
         msg = request.get_json()        
         try:
             if msg and 'events' in msg and len(msg['events']) > 0:
-                #回傳request資料 reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, str(msg))
-                
                 for event in msg['events']:
                     reply_token = event['replyToken']
+                    # 回傳request資料 reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, str(msg))   			
                     linebot_response = handle_event(event)
 					reply_message = [
 						{
