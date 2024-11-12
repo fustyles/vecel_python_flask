@@ -145,3 +145,10 @@ def handle_message(event):
             return ""
     else:
         return ""
+
+'''
+# Vercel環境下不用加入以下程式碼
+
+if __name__ == '__main__':
+    app.run(debug=True)
+'''
