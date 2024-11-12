@@ -129,7 +129,7 @@ def handle_message(event):
     
     if user_message_type == 'text':
         if user_message.lower() == "help":
-            return f"我是Gemini聊天機器人。\n輸入id：查詢userId\n輸入gid：查詢groupId\n輸入rid：查詢roomId\n輸入對話，可與我暢談哦！"        
+            return f"我是Gemini聊天機器人。\n輸入id：查詢userId\n輸入gid：查詢groupId\n輸入rid：查詢roomId"        
         elif user_message.lower() == "id":
             return user_id
         elif user_message.lower() == "gid":
