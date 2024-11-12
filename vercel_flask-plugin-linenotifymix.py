@@ -81,3 +81,11 @@ def linenotify(token, message):
     data = urlencode(payload).encode("utf-8")
     req = Request(url, data=data, headers=headers, method="POST")
     urlopen(req)
+
+
+'''
+# Vercel環境下不用加入以下程式碼
+
+if __name__ == '__main__':
+    app.run(debug=True)
+'''
