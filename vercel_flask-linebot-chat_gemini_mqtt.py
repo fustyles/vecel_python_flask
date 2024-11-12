@@ -10,6 +10,7 @@ Python online
 https://www.onlinegdb.com/
 GeminiKey加解密
 https://github.com/fustyles/vecel_python_flask/edit/main/vercel_flask-linebot-geminiKey_encrypt.py
+Gemini Key要填入加密後的字串，或者自行修改程式碼直接代入！
 """
 
 # 引入 Flask 框架及其相關模組
