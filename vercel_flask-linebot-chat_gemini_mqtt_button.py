@@ -30,6 +30,8 @@ CHANNEL_ACCESS_TOKEN = "iSHcOEyq3PM0Oe/PvgmCY69jAOdW6cWoj1Zn34VFgduEJzGlWWcZnAo6
 
 # Gemini Key
 GeminiKey = "DLcdVbFKegN3kbGnUidgBBMCaxg7MqC7deOwDP8123"
+# Gemini Key Encrypt
+GeminiKeyShift = 3
 
 # Gemini Assistant Behavior
 geminiBehavior = "請分析對話中的情境決定是否開關電燈。\n(1)若判斷情境可能需要開電燈回傳1、可能需要關電燈回傳0，無法判斷或無關或表達模糊回傳-1。\n(2)回傳內容只能是1、0、-1其中之一。\n(3)請不要多做解釋！\n\n\n\n"
@@ -189,7 +191,7 @@ def handle_message(event):
             else:
                 return f"MQTT傳送失敗： {values_list[1]}"            
         else:
-            return handle_gemini(user_message, caesar_decrypt(GeminiKey, 3))
+            return handle_gemini(user_message, caesar_decrypt(GeminiKey, GeminiKeyShift))
     else:
         return ""
 
