@@ -21,7 +21,7 @@ app.config['Project_title'] = '法蘭斯的ChatBot'
 # Line Bot CHANNEL ACCESS TOKEN
 CHANNEL_ACCESS_TOKEN = "iSHcOEyq3PM0Oe/PvgmCY69jAOdW6cWoj1Zn34VFgduEJzGlWWcZnAo6LjMt3L9EAldBB4erN2yt/E5tXQNQt7jSyOGKseY2jPD8czzI/RURL7jF/PBKtGm8PwIIymzXcqqdZLP2zaKRhliJUIMdJQdB04t89/1O/w1cDnyilFU=123"   
 
-# 開關燈控制指令
+# 開關燈控制指令 [標籤文字, 傳送值]
 app.config['button_list'] = {
     "開燈": 'on',
     "關燈": 'off'
