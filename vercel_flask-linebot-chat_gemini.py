@@ -23,6 +23,8 @@ CHANNEL_ACCESS_TOKEN = "iSHcOEyq3PM0Oe/PvgmCY69jAOdW6cWoj1Zn34VFgduEJzGlWWcZnAo6
 
 # Gemini Key
 GeminiKey = "DLcdVbFKegN3kbGnUidgBBMCaxg7MqC7deOwDP8123"
+# Gemini Key Decrypt
+GeminiKeyShift = 3
 
 # Gemini Assistant Behavior
 geminiBehavior = ""
@@ -110,7 +112,7 @@ def handle_message(event):
         elif user_message.lower() == "rid":
             return room_id            
         else:
-            return handle_gemini(user_message, caesar_decrypt(GeminiKey, 3))
+            return handle_gemini(user_message, caesar_decrypt(GeminiKey, GeminiKeyShift))
     else:
         return ""
 
