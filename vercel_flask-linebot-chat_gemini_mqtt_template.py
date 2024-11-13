@@ -1,16 +1,12 @@
 """
-Author : ChungYi Fu (Kaohsiung, Taiwan)   2024/11/12 12:00
+Author : ChungYi Fu (Kaohsiung, Taiwan)   2024/11/13 08:00
 https://www.facebook.com/francefu
 
 設定requirements.txt
 Flask==3.0.3
 Flask-MQTT==1.2.1
 
-Python online
-https://www.onlinegdb.com/
-GeminiKey加解密
-https://github.com/fustyles/vecel_python_flask/edit/main/vercel_flask-linebot-geminiKey_encrypt.py
-Gemini Key要填入加密後的字串，或者自行修改程式碼直接代入！
+Gemini Key要填入加密後的字串，或者自行修改程式直接代入！
 """
 
 # 引入 Flask 框架及其相關模組
@@ -42,8 +38,8 @@ GeminiKeyShift = 3
 # Gemini Assistant Behavior
 geminiBehavior = "請分析對話中的情境決定是否開關電燈。\n(1)若判斷情境可能需要開電燈回傳1、可能需要關電燈回傳0，無法判斷或無關或表達模糊回傳-1。\n(2)回傳內容只能是1、0、-1其中之一。\n(3)請不要多做解釋！\n\n\n\n"
 
-# 限定Gemini回傳的值
-app.config['variable_val'] = ['1', '0', '-1']
+# 限定Gemini回傳的值比對清單
+app.config['gemini_response'] = ['1', '0', '-1']
 
 # 設定 MQTT 相關設定
 app.config['MQTT_BROKER_URL'] = 'broker.MQTTGO.io'
@@ -60,20 +56,6 @@ app.config['MQTT_SUBSCRIBE_MESSAGE'] = ''
 # 初始化 Flask-MQTT       
 mqtt = Mqtt(app)    
 
-# HELP指令  [標籤文字, 指令文字]
-app.config['help_list'] = {
-    "查詢userId": 'id',
-    "查詢groupId": 'gid',
-    "查詢roomId": 'rid',
-    "LED燈控制": 'led' 
-}
-
-# 開關燈控制指令 [標籤文字, MQTT傳送值]
-app.config['button_list'] = {
-    "開燈": '1',
-    "關燈": '0'
-}
-
 # 定義一個路由 /about 觸發此函數
 @app.route('/about')
 def about():
@@ -86,9 +68,10 @@ def home():
         msg = request.get_json()        
         try:
             if msg and 'events' in msg and len(msg['events']) > 0:
+                #回傳request資料 reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, str(msg))
+                
                 for event in msg['events']:
                     reply_token = event['replyToken']
-                    # 回傳request資料 reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, str(msg))                    
                     linebot_response = handle_event(event)
                     if linebot_response:
                         reply_message = [
@@ -139,17 +122,13 @@ def handle_event(event):
         return ""
 
 def handle_message(event):
-    # 處理訊息事件 
+    # 處理訊息事件
     user_message = event['message']['text'].strip()
     user_message_type = event['message']['type']
     user_id = event['source']['userId']
     group_id = event['source'].get('groupId', '請將Line bot加入群組後於群組輸入gid重新查詢')
     room_id = event['source'].get('roomId', '請將Line bot加入聊天室後於聊天室輸入rid重新查詢')
     reply_token = event['replyToken']    
-    help_keys_list = list(app.config['help_list'].keys())
-    help_values_list = list(app.config['help_list'].values())    
-    button_keys_list = list(app.config['button_list'].keys())
-    button_values_list = list(app.config['button_list'].values())    
 
     if user_message_type == 'text':
         if user_message.lower() == "help":
@@ -165,23 +144,23 @@ def handle_message(event):
                         "actions": [
                             {
                                 "type": "message",
-                                "label": help_keys_list[0],
-                                "text": help_values_list[0]
+                                "label": "查詢userId",
+                                "text": "id"
                             },
                             {
                                 "type": "message",
-                                "label": help_keys_list[1],
-                                "text": help_values_list[1]
+                                "label": "查詢groupId",
+                                "text": "gid"
                             },
                             {
                                 "type": "message",
-                                "label": help_keys_list[2],
-                                "text": help_values_list[2]
+                                "label": "查詢roomId",
+                                "text": "rid"
                             },
                             {
                                 "type": "message",
-                                "label": help_keys_list[3],
-                                "text": help_values_list[3]
+                                "label": "LED燈控制",
+                                "text": "led"
                             }
                         ]
                     }
@@ -189,13 +168,13 @@ def handle_message(event):
             ]
             res = reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, reply_message)
             return jsonify(res)
-        elif user_message.lower() == help_values_list[0]:
+        elif user_message.lower() == "id":
             return user_id
-        elif user_message.lower() == help_values_list[1]:
+        elif user_message.lower() == "gid":
             return group_id
-        elif user_message.lower() == help_values_list[2]:
+        elif user_message.lower() == "rid":
             return room_id
-        elif user_message.lower() == help_values_list[3]:
+        elif user_message.lower() == "led":     
             reply_message = [
                 {
                     "type": "template",
@@ -211,13 +190,13 @@ def handle_message(event):
                         "actions": [
                             {
                                 "type": "message",
-                                "label": button_keys_list[0],
-                                "text": button_keys_list[0]
+                                "label": "開燈",
+                                "text": "開燈"
                             },
                             {
                                 "type": "message",
-                                "label": button_keys_list[1],
-                                "text": button_keys_list[1]
+                                "label": "關燈",
+                                "text": "關燈"
                             }
                         ]
                     }
@@ -225,18 +204,20 @@ def handle_message(event):
             ]
             res = reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, reply_message)
             return jsonify(res)
-        elif user_message.lower() == button_keys_list[0]:
-            mqtt_res = handle_mqtt_sendMessage(button_values_list[0])
+        elif user_message.lower() == "開燈":
+            mqtt_message = "1"
+            mqtt_res = handle_mqtt_sendMessage(mqtt_message)
             if mqtt_res == "ok":
-                return f"MQTT傳送成功： {button_values_list[0]}\n{app.config['MQTT_SUBSCRIBE_MESSAGE']}"
+                return f"MQTT傳送成功： {mqtt_message}\n{app.config['MQTT_SUBSCRIBE_MESSAGE']}"
             else:
-                return f"MQTT傳送失敗： {button_values_list[0]}"
-        elif user_message.lower() == button_keys_list[1]:
-            mqtt_res = handle_mqtt_sendMessage(button_values_list[1])
+                return f"MQTT傳送失敗： {mqtt_message}"
+        elif user_message.lower() == "關燈":
+            mqtt_message = "0"
+            mqtt_res = handle_mqtt_sendMessage(mqtt_message)
             if mqtt_res == "ok":
-                return f"MQTT傳送成功： {button_values_list[1]}\n{app.config['MQTT_SUBSCRIBE_MESSAGE']}"
+                return f"MQTT傳送成功： {mqtt_message}\n{app.config['MQTT_SUBSCRIBE_MESSAGE']}"
             else:
-                return f"MQTT傳送失敗： {button_values_list[1]}"
+                return f"MQTT傳送失敗： {mqtt_message}"
         else:
             return handle_gemini(user_message, caesar_decrypt(GeminiKey, GeminiKeyShift))
     else:
@@ -310,7 +291,7 @@ def handle_mqtt_sendMessage(val):
     val = re.sub(r'[\n\r\t]', '', val).strip()
 
     # 檢查參數資料是否正確
-    if val not in app.config['variable_val']:
+    if val not in app.config['gemini_response']:
         return ""
   
     # 構建 MQTT JSON 格式資料並發佈到指定主題
