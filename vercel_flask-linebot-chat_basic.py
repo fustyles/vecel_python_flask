@@ -4,6 +4,12 @@ https://www.facebook.com/francefu
 
 設定requirements.txt
 Flask==3.0.3
+
+Python online
+https://www.onlinegdb.com/
+GeminiKey加解密
+https://github.com/fustyles/vecel_python_flask/edit/main/vercel_flask-linebot-geminiKey_encrypt.py
+Gemini Key要填入加密後的字串，或者自行修改程式碼直接代入！
 """
 
 # 引入 Flask 框架及其相關模組
@@ -19,7 +25,15 @@ app = Flask(__name__)
 app.config['Project_title'] = '法蘭斯的ChatBot'
 
 # Line Bot CHANNEL ACCESS TOKEN
-CHANNEL_ACCESS_TOKEN = "iSHcOEyq3PM0Oe/PvgmCY69jAOdW6cWoj1Zn34VFgduEJzGlWWcZnAo6LjMt3L9EAldBB4erN2yt/E5tXQNQt7jSyOGKseY2jPD8czzI/RURL7jF/PBKtGm8PwIIymzXcqqdZLP2zaKRhliJUIMdJQdB04t89/1O/w1cDnyilFU=123"
+CHANNEL_ACCESS_TOKEN = "iSHcOEyq3PM0Oe/PvgmCY69jAOdW6cWoj1Zn34VFgduEJzGlWWcZnAo6LjMt3L9EAldBB4erN2yt/E5tXQNQt7jSyOGKseY2jPD8czzI/RURL7jF/PBKtGm8PwIIymzXcqqdZLP2zaKRhliJUIMdJQdB04t89/1O/w1cDnyilFU="
+
+# Gemini Key (Encrypted)
+GeminiKey = "AIzaSyCBRRmulUbnYFBAzsAsWZCT6DjyhnBReSI"
+# Gemini Key Decrypt Shift
+GeminiKeyShift = 3
+
+# Gemini Assistant Behavior
+geminiBehavior = ""
 
 # 定義一個路由 /about 觸發此函數
 @app.route('/about')
@@ -35,7 +49,8 @@ def home():
             if msg and 'events' in msg and len(msg['events']) > 0:
                 for event in msg['events']:
                     reply_token = event['replyToken']
-                    # 回傳request資料 reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, str(msg))   			
+                    # 回傳request資料 reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, str(msg))   					
+                    linebot_response = handle_event(event)
                     if linebot_response:
                         reply_message = [
                             {
@@ -81,28 +96,8 @@ def handle_event(event):
                 
     if event_type == 'message':
         return handle_message(event)
-    elif event_type == 'follow':
-        return handle_follow(event)
-    elif event_type == 'unfollow':
-        return handle_unfollow(event)
-    elif event_type == 'join':
-        return handle_join(event)
-    elif event_type == 'leave':
-        return handle_leave(event)
-    elif event_type == 'postback':
-        return handle_postback(event)
-    elif event_type == 'beacon':
-        return handle_beacon(event)
-    elif event_type == 'accountLink':
-        return handle_account_link(event)
-    elif event_type == 'memberJoined':
-        return handle_member_joined(event)
-    elif event_type == 'memberLeft':
-        return handle_member_left(event)
-    elif event_type == 'things':
-        return handle_things(event)
     else:
-        return f"Unknown event type: {event_type}"
+        return ""
 
 def handle_message(event):
     # 處理訊息事件
@@ -113,67 +108,83 @@ def handle_message(event):
     room_id = event['source'].get('roomId', '請將Line bot加入聊天室後於聊天室輸入rid重新查詢')
     
     if user_message_type == 'text':
-        if user_message == "id":
+        if user_message.lower() == "help":
+            return f"我是Gemini聊天機器人。\n\n輸入id：查詢userId\n輸入gid：查詢groupId\n輸入rid：查詢roomId\n\n輸入對話，可與Gemini暢談哦！"        
+        elif user_message.lower() == "id":
             return user_id
-        elif user_message == "gid":
+        elif user_message.lower() == "gid":
             return group_id
-        elif user_message == "rid":
+        elif user_message.lower() == "rid":
             return room_id            
         else:
-            return ""
-    elif user_message_type == 'image':
-        return ""
-    elif user_message_type == 'video':
-        return ""
-    elif user_message_type == 'audio':
-        return ""
-    elif user_message_type == 'location':
-        return ""
-    elif user_message_type == 'sticker':
-        return ""
+            return handle_gemini(user_message, GeminiKey)
     else:
         return ""
 
-def handle_follow(event):
-    # 處理追蹤事件
-    return "感謝您的追蹤！"
+def handle_gemini(message, key):
+    try:
+        # 設定請求的 URL
+        url = f"/v1beta/models/gemini-1.5-flash-latest:generateContent?key={key}"
+        host = "generativelanguage.googleapis.com"
 
-def handle_unfollow(event):
-    # 處理取消追蹤事件
-    return "很遺憾看到您離開。"
+        # 構建請求的資料
+        payload = {
+            "contents": [
+                {
+                    "parts": [                       
+                        {
+                            "text": f"{geminiBehavior}\n{message}"
+                        }
+                    ]
+                }
+            ]
+        }
 
-def handle_join(event):
-    # 處理加入群組或聊天室事件
-    group_id = event['source'].get('groupId', '')    
-    return f"{app.config['Project_title']}，大家好！\ngroupId: {group_id}"
+        # 設定 HTTP 請求
+        headers = {
+            'Content-Type': 'application/json; charset=utf-8'
+        }
 
-def handle_leave(event):
-    # 處理離開群組或聊天室事件
-    return "再見！"
+        # 建立 HTTP 連接
+        conn = http.client.HTTPSConnection(host)
+        conn.request("POST", url, body=json.dumps(payload), headers=headers)
 
-def handle_postback(event):
-    # 處理 postback 事件
-    return "您觸發了 postback 事件。"
+        # 獲取 HTTP 回應
+        response = conn.getresponse()
+        response_data = response.read().decode('utf-8')
+        conn.close()
 
-def handle_beacon(event):
-    # 處理 beacon 事件
-    return "您進入了 Beacon 範圍。"
+        # 解析 JSON 回應
+        json_response = json.loads(response_data)
+        response_text = json_response["candidates"][0]["content"]["parts"][0]["text"]
+        if response_text == "null":
+            response_text = json_response["error"]["message"]
 
-def handle_account_link(event):
-    # 處理帳號連結事件
-    return "帳號連結成功。"
+        return response_text
 
-def handle_member_joined(event):
-    # 處理成員加入事件
-    return "新成員加入了群組。"
+    except Exception as e:
+        return str(e)
 
-def handle_member_left(event):
-    # 處理成員離開事件
-    return "成員離開了群組。"
+# 「凱撒密碼」（Caesar Cipher），它通過將每個字母替換為字母表中固定位置的另一個字母來進行加密和解密。
+def caesar_encrypt(text, shift):
+    encrypted_text = ""
+    for char in text:
+        if char.isalpha():
+            shift_base = ord('A') if char.isupper() else ord('a')
+            encrypted_text += chr((ord(char) - shift_base + shift) % 26 + shift_base)
+        else:
+            encrypted_text += char
+    return encrypted_text
 
-def handle_things(event):
-    # 處理 LINE Things 事件
-    return "收到 LINE Things 裝置的訊息。"
+def caesar_decrypt(text, shift):
+    decrypted_text = ""
+    for char in text:
+        if char.isalpha():
+            shift_base = ord('A') if char.isupper() else ord('a')
+            decrypted_text += chr((ord(char) - shift_base - shift) % 26 + shift_base)
+        else:
+            decrypted_text += char
+    return decrypted_text
 
 
 '''
@@ -181,60 +192,4 @@ def handle_things(event):
 
 if __name__ == '__main__':
     app.run(debug=True)
-'''
-
-
-'''
-Line Bot 訊息格式
-{
-  "destination": "xxxxxxxxxx",
-  "events": [
-    {
-      "type": "message",
-      "message": {
-        "type": "text",
-        "id": "14353798921116",
-        "text": "Hello, world"
-      },
-      "timestamp": 1625665242211,
-      "source": {
-        "type": "user",
-        "userId": "U80696558e1aa831..."
-      },
-      "replyToken": "757913772c4646b784d4b7ce46d12671",
-      "mode": "active",
-      "webhookEventId": "01FZ74A0TDDPYRVKNK77XKC3ZR",
-      "deliveryContext": {
-        "isRedelivery": false
-      }
-    },
-    {
-      "type": "follow",
-      "timestamp": 1625665242214,
-      "source": {
-        "type": "user",
-        "userId": "Ufc729a925b3abef..."
-      },
-      "replyToken": "bb173f4d9cf64aed9d408ab4e36339ad",
-      "mode": "active",
-      "webhookEventId": "01FZ74ASS536FW97EX38NKCZQK",
-      "deliveryContext": {
-        "isRedelivery": false
-      }
-    },
-    {
-      "type": "unfollow",
-      "timestamp": 1625665242215,
-      "source": {
-        "type": "user",
-        "userId": "Ubbd4f124aee5113..."
-      },
-      "mode": "active",
-      "webhookEventId": "01FZ74B5Y0F4TNKA5SCAVKPEDM",
-      "deliveryContext": {
-        "isRedelivery": false
-      }
-    }
-  ]
-}
 '''
