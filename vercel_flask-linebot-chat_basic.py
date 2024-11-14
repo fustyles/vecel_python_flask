@@ -36,14 +36,14 @@ def home():
                 for event in msg['events']:
                     reply_token = event['replyToken']
                     # 回傳request資料 reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, str(msg))   			
-                    linebot_response = handle_event(event)
-					reply_message = [
-						{
-							'type': 'text',
-							'text': linebot_response
-						}
-					]					
-                    reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, reply_message)
+                    if linebot_response:
+                        reply_message = [
+                            {
+                                'type': 'text',
+                                'text': linebot_response
+                            }
+                        ]                    
+                        reply_message_to_line_bot(CHANNEL_ACCESS_TOKEN, reply_token, reply_message)
                     
         except Exception as e:
             # 捕捉並回應錯誤訊息
