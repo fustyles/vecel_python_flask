@@ -29,10 +29,8 @@ app.config['Project_title'] = '法蘭斯的ChatBot'
 # Line Bot CHANNEL ACCESS TOKEN
 CHANNEL_ACCESS_TOKEN = "iSHcOEyq3PM0Oe/PvgmCY69jAOdW6cWoj1Zn34VFgduEJzGlWWcZnAo6LjMt3L9EAldBB4erN2yt/E5tXQNQt7jSyOGKseY2jPD8czzI/RURL7jF/PBKtGm8PwIIymzXcqqdZLP2zaKRhliJUIMdJQdB04t89/1O/w1cDnyilFU=123"
 
-# Gemini Key (Encrypted)
+# Gemini Key
 GeminiKey = "DLcdVbFKegN3kbGnUidgBBMCaxg7MqC7deOwDP8123"
-# Gemini Key Decrypt Shift
-GeminiKeyShift = 3
 
 # Gemini Assistant Behavior
 geminiBehavior = "請分析對話中的情境決定是否開關電燈。\n(1)若判斷情境可能需要開電燈回傳1、可能需要關電燈回傳0，無法判斷或無關或表達模糊回傳-1。\n(2)回傳內容只能是1、0、-1其中之一。\n(3)請不要多做解釋！\n\n\n\n"
@@ -119,7 +117,7 @@ def handle_message(event):
         elif user_message.lower() == "rid":
             return room_id            
         else:
-            return handle_gemini(user_message, caesar_decrypt(GeminiKey, GeminiKeyShift))
+            return handle_gemini(user_message, GeminiKey)
     else:
         return ""
 
@@ -167,26 +165,7 @@ def handle_gemini(message, key):
     except Exception as e:
         return str(e)
 
-# 「凱撒密碼」（Caesar Cipher），它通過將每個字母替換為字母表中固定位置的另一個字母來進行加密和解密。
-def caesar_encrypt(text, shift):
-    encrypted_text = ""
-    for char in text:
-        if char.isalpha():
-            shift_base = ord('A') if char.isupper() else ord('a')
-            encrypted_text += chr((ord(char) - shift_base + shift) % 26 + shift_base)
-        else:
-            encrypted_text += char
-    return encrypted_text
 
-def caesar_decrypt(text, shift):
-    decrypted_text = ""
-    for char in text:
-        if char.isalpha():
-            shift_base = ord('A') if char.isupper() else ord('a')
-            decrypted_text += chr((ord(char) - shift_base - shift) % 26 + shift_base)
-        else:
-            decrypted_text += char
-    return decrypted_text
 
 '''
 # Vercel環境下不用加入以下程式碼
