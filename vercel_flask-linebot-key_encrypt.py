@@ -4,8 +4,6 @@ https://www.facebook.com/francefu
 
 Python online
 https://www.onlinegdb.com/
-GeminiKey加解密
-https://github.com/fustyles/vecel_python_flask/edit/main/vercel_flask-linebot-geminiKey_encrypt.py
 """
 
 def caesar_encrypt(text, shift):
