@@ -33,15 +33,15 @@ def caesar_decrypt(text, shift):
 
 
 # 測試範例
-# Gemini Key 
-GeminiKey = "12345678"
+# Key 
+Key = "12345678"
 # Encrypt Shift
-GeminiKeyShift = 3
+KeyShift = 3
 
 # 加密
-encrypted_text = caesar_encrypt(GeminiKey, GeminiKeyShift)
+encrypted_text = caesar_encrypt(Key, KeyShift)
 print(f"Encrypted text: {encrypted_text}")
 
 # 解密
-decrypted_text = caesar_decrypt(encrypted_text, GeminiKeyShift)
+decrypted_text = caesar_decrypt(encrypted_text, KeyShift)
 print(f"Decrypted text: {decrypted_text}")
