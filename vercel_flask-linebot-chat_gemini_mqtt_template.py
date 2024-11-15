@@ -5,8 +5,6 @@ https://www.facebook.com/francefu
 設定requirements.txt
 Flask==3.0.3
 Flask-MQTT==1.2.1
-
-Gemini Key要填入加密後的字串，或者自行修改程式直接代入！
 """
 
 # 引入 Flask 框架及其相關模組
